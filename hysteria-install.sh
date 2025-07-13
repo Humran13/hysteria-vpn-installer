@@ -2,28 +2,30 @@
 
 set -e
 
-echo "[+] Updating system..."
+echo "[+] Installing Hysteria2 with Obfuscation..."
+
+# Update system
 apt update && apt upgrade -y
 apt install curl wget tar openssl -y
 
-echo "[+] Creating folders..."
+# Create folders
 mkdir -p /opt/hysteria /etc/hysteria
 cd /opt/hysteria
 
-echo "[+] Downloading Hysteria binary..."
+# Download latest Hysteria binary
 wget -q https://github.com/apernet/hysteria/releases/latest/download/hysteria-linux-amd64 -O hysteria
 chmod +x hysteria
 mv hysteria /usr/local/bin/
 
-echo "[+] Generating self-signed TLS cert..."
+# Generate self-signed TLS certificate
 openssl req -x509 -newkey rsa:2048 -days 365 -nodes \
--keyout /etc/hysteria/hysteria.key \
--out /etc/hysteria/hysteria.crt \
--subj "/CN=Hysteria VPN"
+  -keyout /etc/hysteria/hysteria.key \
+  -out /etc/hysteria/hysteria.crt \
+  -subj "/CN=HysteriaVPN"
 
-echo "[+] Creating config file..."
+# Create server config file
 cat > /etc/hysteria/config.yaml <<EOF
-listen: :5678
+listen: :5353
 
 tls:
   cert: /etc/hysteria/hysteria.crt
@@ -35,8 +37,7 @@ auth:
 
 obfs:
   type: salamander
-  password: salamander123
-
+  password: test123
 
 masquerade:
   type: proxy
@@ -46,10 +47,10 @@ masquerade:
 disable_udp: false
 EOF
 
-echo "[+] Creating systemd service..."
+# Create systemd service
 cat > /etc/systemd/system/hysteria-server.service <<EOF
 [Unit]
-Description=Hysteria VPN Server
+Description=Hysteria2 VPN Server with Obfuscation
 After=network.target
 
 [Service]
@@ -60,12 +61,15 @@ Restart=on-failure
 WantedBy=multi-user.target
 EOF
 
-echo "[+] Enabling and starting service..."
+# Reload, enable and start the service
 systemctl daemon-reexec
 systemctl enable --now hysteria-server
 
-echo "[+] Allowing UDP port 5678..."
-ufw allow 5678/udp || true
+# Open firewall
+ufw allow 5353/udp || true
 iptables -A INPUT -p udp --dport 5678 -j ACCEPT || true
 
-echo "[✅] Hysteria VPN server installed and running on UDP port 5678"
+echo "[✅] Hysteria2 server installed and running on UDP port 5353 with Obfuscation"
+echo "[🔑] Connection Link (for HTTP Custom):"
+echo ""
+echo "hysteria2://IronWallPass947@@YOUR_SERVER_IP:5678/?insecure=1&obfs=test123&upmbps=10&downmbps=100"
