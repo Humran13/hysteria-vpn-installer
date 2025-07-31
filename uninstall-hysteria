@@ -1,9 +1,17 @@
 #!/bin/bash
-echo "🧹 Uninstalling Hysteria 2..."
-systemctl stop hysteria
-systemctl disable hysteria
+
+echo "🧹 Starting Hysteria 2 uninstallation..."
+
+# Stop and disable service
+systemctl stop hysteria 2>/dev/null
+systemctl disable hysteria 2>/dev/null
+
+# Remove files
 rm -f /etc/systemd/system/hysteria.service
 rm -f /usr/local/bin/hysteria
 rm -rf /etc/hysteria
+
+# Reload systemd
 systemctl daemon-reload
-echo "✅ Hysteria 2 uninstalled."
+
+echo "✅ Hysteria 2 has been completely removed from your system."
