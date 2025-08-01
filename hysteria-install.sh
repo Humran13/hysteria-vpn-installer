@@ -33,6 +33,12 @@ auth:
   type: password
   password: yourStrongPassword123
 
+obfs:
+  type: salamander
+  salamander:
+    password: salamander123
+
+
 masquerade:
   type: proxy
   proxy:
